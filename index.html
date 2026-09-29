@@ -541,7 +541,7 @@ section { padding-block: 96px; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center 70%;
   display: block;
   transition: transform 0.4s;
 }
@@ -1895,27 +1895,14 @@ section { padding-block: 96px; }
   margin-top: 20px;
 }
 .visit-map {
-  background: linear-gradient(135deg, #d8e0d3 0%, #c4d2bd 100%);
+  background: #eef2ea;
   border-radius: 6px;
   aspect-ratio: 5 / 4;
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-soft);
-  display: grid;
-  place-items: center;
 }
-.visit-map::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px),
-    linear-gradient(rgba(37,95,54,0.06) 2px, transparent 2px),
-    linear-gradient(90deg, rgba(37,95,54,0.06) 2px, transparent 2px);
-  background-size: 40px 40px, 40px 40px, 160px 160px, 160px 160px;
-  opacity: 0.7;
-}
+.visit-map iframe { width: 100%; height: 100%; }
 .map-pin {
   position: relative;
   z-index: 1;
@@ -2704,10 +2691,14 @@ footer {
 
     <div class="visit-grid">
       <div class="visit-map">
-        <div class="map-pin">
-          <div class="map-pin-marker"></div>
-          <div class="map-pin-label">Dapo &amp; Dough · Sek 3</div>
-        </div>
+        <iframe
+          src="https://maps.google.com/maps?q=Dapo+%26+Dough+26+Jalan+Jelutung+3%2F16+Seksyen+3+Shah+Alam&t=&z=17&ie=UTF8&iwloc=&output=embed"
+          width="100%" height="100%"
+          style="border:0; display:block;"
+          allowfullscreen loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Dapo & Dough location">
+        </iframe>
       </div>
       <div class="visit-info">
         <h3>Address</h3>
