@@ -927,6 +927,25 @@ section { padding-block: 96px; }
 }
 
 /* Live notifications card */
+.spam-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 18px 0 4px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: rgba(245, 213, 111, 0.16);
+  border: 1px solid rgba(245, 213, 111, 0.55);
+}
+.spam-notice-icon { font-size: 18px; line-height: 1.3; flex: none; }
+.spam-notice p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+.spam-notice strong { font-weight: 700; color: var(--forest-deep); }
+
 .notif-card {
   background: var(--white);
   border: 1px solid var(--line);
@@ -1217,12 +1236,69 @@ section { padding-block: 96px; }
   display: block;
 }
 
+/* Range tabs: This week / Next 30 days */
+.admin-range-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 18px 32px 0;
+  background: var(--broken-warm);
+}
+.admin-range-tab {
+  padding: 9px 18px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.admin-range-tab:hover { border-color: var(--forest); color: var(--forest); }
+.admin-range-tab.active {
+  background: var(--forest-deep);
+  border-color: var(--forest-deep);
+  color: var(--gold);
+}
+
+/* Scrollable date chip row with arrow controls */
+.admin-filter-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 20px 8px;
+  background: var(--broken-warm);
+}
+.admin-scroll-btn {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--forest);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+.admin-scroll-btn svg { width: 18px; height: 18px; }
+.admin-scroll-btn:hover:not(:disabled) { border-color: var(--forest); background: var(--forest); color: var(--broken); }
+.admin-scroll-btn:disabled { opacity: 0.25; cursor: default; }
+
 .admin-filter {
   display: flex;
   gap: 8px;
-  padding: 20px 32px 8px;
+  padding: 4px 2px;
   overflow-x: auto;
+  scroll-behavior: smooth;
   scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
 }
 .admin-filter::-webkit-scrollbar { display: none; }
 .admin-filter button {
@@ -1246,6 +1322,24 @@ section { padding-block: 96px; }
   border-color: var(--forest);
   font-weight: 600;
 }
+/* Today's chip gets a gold outline so it's easy to find in a 30-day row */
+.admin-filter button.is-today:not(.active) {
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px var(--gold);
+  font-weight: 600;
+}
+/* Days that already have bookings get a small dot */
+.admin-filter button.has-bookings::after {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--forest);
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+.admin-filter button.has-bookings.active::after { background: var(--gold); }
 
 .admin-list {
   padding: 12px 32px 32px;
@@ -1353,6 +1447,63 @@ section { padding-block: 96px; }
   font-weight: 500;
 }
 .admin-block-slot:hover, .admin-add-walkin:hover { border-color: var(--forest); color: var(--forest); }
+.admin-day-actions { display: flex; gap: 8px; margin-top: 8px; }
+.admin-day-actions button { margin-top: 0; }
+.admin-add-walkin { border-color: rgba(37,95,54,0.4); color: var(--forest); }
+@media (max-width: 560px) {
+  .admin-day-actions { flex-direction: column; gap: 6px; }
+}
+
+/* ---- Admin add-booking / block-slot form modal ---- */
+.adm-form-modal .modal-box { max-width: 460px; background: var(--broken-warm); }
+.adm-form-head {
+  background: var(--forest-deep);
+  color: var(--broken);
+  padding: 22px 26px;
+  border-radius: 12px 12px 0 0;
+}
+.adm-form-head h3 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 19px; font-weight: 400; margin: 0 0 3px;
+}
+.adm-form-head p {
+  margin: 0; font-size: 12px;
+  color: rgba(247,247,243,0.65);
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.adm-form-body { padding: 22px 26px 26px; }
+.adm-field { margin-bottom: 14px; }
+.adm-field label {
+  display: block; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-soft); margin-bottom: 6px;
+}
+.adm-field label .opt { font-weight: 400; text-transform: none; letter-spacing: 0; opacity: 0.7; }
+.adm-field input, .adm-field select, .adm-field textarea {
+  width: 100%; box-sizing: border-box;
+  padding: 10px 12px; border: 1px solid var(--line);
+  border-radius: 6px; background: var(--white);
+  font-family: inherit; font-size: 14px; color: var(--ink);
+}
+.adm-field input:focus, .adm-field select:focus, .adm-field textarea:focus {
+  outline: none; border-color: var(--forest); box-shadow: 0 0 0 2px rgba(37,95,54,0.14);
+}
+.adm-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.adm-check {
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 12.5px; color: var(--ink-soft); line-height: 1.5;
+  margin: 2px 0 16px;
+}
+.adm-check input { width: 16px; height: 16px; margin: 1px 0 0; flex: none; accent-color: var(--forest); }
+.adm-form-actions { display: flex; gap: 10px; margin-top: 4px; }
+.adm-form-actions button { flex: 1; padding: 12px; border-radius: 6px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; border: 1px solid var(--line); }
+.adm-btn-cancel { background: transparent; color: var(--ink-soft); }
+.adm-btn-cancel:hover { border-color: var(--ink-soft); }
+.adm-btn-save { background: var(--forest); color: var(--broken); border-color: var(--forest); }
+.adm-btn-save:hover:not(:disabled) { background: var(--forest-deep); }
+.adm-btn-save:disabled { opacity: 0.6; cursor: default; }
+.adm-form-error { font-size: 12.5px; color: #B94F4F; min-height: 17px; margin: 0 0 8px; }
+.adm-form-hint { font-size: 12px; color: var(--ink-soft); font-style: italic; margin: 0 0 16px; }
 
 .admin-empty {
   text-align: center;
@@ -1365,7 +1516,11 @@ section { padding-block: 96px; }
 
 @media (max-width: 640px) {
   .admin-stats { grid-template-columns: 1fr 1fr; padding: 20px; gap: 10px; }
-  .admin-filter { padding: 16px 20px 6px; }
+  .admin-range-tabs { padding: 14px 20px 0; }
+  .admin-range-tab { flex: 1; text-align: center; padding: 9px 10px; font-size: 12px; }
+  .admin-filter-wrap { padding: 12px 12px 6px; gap: 4px; }
+  .admin-scroll-btn { width: 28px; height: 28px; }
+  .admin-filter { padding: 4px 0; }
   .admin-list { padding: 8px 20px 24px; }
   .admin-row { grid-template-columns: 60px 1fr auto; padding: 12px; gap: 10px; }
   .admin-actions { grid-column: 1 / -1; justify-content: flex-end; }
@@ -1660,6 +1815,63 @@ section { padding-block: 96px; }
 .slot small { display: block; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.6; margin-top: 3px; }
 .slot.full small { color: #B94F4F; opacity: 1; }
 
+/* ---- Loading states ---- */
+@keyframes dd-shimmer {
+  0%   { background-position: -340px 0; }
+  100% { background-position: 340px 0; }
+}
+.slot.skeleton {
+  cursor: default;
+  pointer-events: none;
+  border-color: var(--line);
+  color: transparent;
+  background: linear-gradient(90deg, #f0efe9 0%, #f8f7f3 50%, #f0efe9 100%);
+  background-size: 680px 100%;
+  animation: dd-shimmer 1.3s linear infinite;
+}
+.slot.skeleton small { color: transparent; }
+
+.load-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 0 2px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.spinner-ring {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(37, 95, 54, 0.2);
+  border-top-color: var(--forest);
+  border-radius: 50%;
+  animation: dd-spin 0.7s linear infinite;
+  flex: none;
+}
+@keyframes dd-spin { to { transform: rotate(360deg); } }
+
+.cal-wrap { position: relative; }
+.cal-loading-veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(247, 247, 243, 0.72);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--forest);
+  font-style: italic;
+  border-radius: 6px;
+  z-index: 3;
+}
+body.dd-busy { cursor: progress; }
+body.dd-busy button, body.dd-busy .slot, body.dd-busy .cal-day { cursor: progress; }
+
 /* Party + form */
 .field-row {
   display: grid;
@@ -1679,6 +1891,13 @@ section { padding-block: 96px; }
   color: var(--ink-soft);
   font-weight: 600;
 }
+.field-note {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+.field-note a { color: var(--forest); text-decoration: underline; font-weight: 600; }
 .field input, .field select {
   padding: 12px 14px;
   border: 1px solid var(--line);
@@ -2140,7 +2359,7 @@ footer {
 <script>
   (function() {
     if (typeof emailjs !== 'undefined') {
-      try { emailjs.init({ publicKey: 'CgK70XAqF339M78Lg' }); } catch(e) { console.warn('EmailJS init failed:', e); }
+      try { emailjs.init({ publicKey: 'PBDYtb2P3O1q-sjIM' }); } catch(e) { console.warn('EmailJS init failed:', e); }
     }
   })();
 </script>
@@ -2526,13 +2745,12 @@ footer {
           <div class="field">
             <label for="fparty">Party size</label>
             <select id="fparty">
-              <option>2 people</option>
-              <option>3 people</option>
-              <option>4 people</option>
-              <option>5 people</option>
-              <option>6 people</option>
-              <option>7+ people (call us)</option>
+              <option value="1">1 person</option>
+              <option value="2" selected>2 people</option>
+              <option value="3">3 people</option>
+              <option value="4">4 people</option>
             </select>
+            <p class="field-note">More than 4? <a href="https://wa.me/60148303880" target="_blank" rel="noopener">WhatsApp us</a> and we'll put tables together for you.</p>
           </div>
           <div class="field">
             <label for="femail">Email (for confirmation)</label>
@@ -2849,6 +3067,11 @@ footer {
         </div>
       </div>
 
+      <div class="spam-notice">
+        <span class="spam-notice-icon">📧</span>
+        <p><strong>Can't find our email?</strong> First-time bookings sometimes land in the <strong>Spam</strong> or <strong>Promotions</strong> folder. Please check there, and mark it as "Not spam" so future confirmations reach your inbox.</p>
+      </div>
+
       <div class="confirm-what">
         <h4>When you arrive</h4>
         <ol class="confirm-steps">
@@ -2915,19 +3138,103 @@ footer {
       </div>
 
       <div class="admin-stats">
-        <div class="admin-stat"><label>This week</label><span class="value" id="stat-week">0</span><span class="sub">bookings received</span></div>
+        <div class="admin-stat"><label id="stat-week-label">This week</label><span class="value" id="stat-week">0</span><span class="sub">bookings received</span></div>
         <div class="admin-stat gold"><label>Today</label><span class="value" id="stat-today">0</span><span class="sub">tables to seat</span></div>
-        <div class="admin-stat"><label>Guests</label><span class="value" id="stat-guests">0</span><span class="sub">across the week</span></div>
+        <div class="admin-stat"><label>Guests</label><span class="value" id="stat-guests">0</span><span class="sub" id="stat-guests-sub">across the week</span></div>
         <div class="admin-stat warn"><label>Blocked slots</label><span class="value" id="stat-blocked">0</span><span class="sub">manual holds</span></div>
       </div>
 
-      <div class="admin-filter" id="adminFilter">
-        <!-- filter buttons injected -->
+      <div class="admin-range-tabs">
+        <button type="button" class="admin-range-tab active" data-range="week">This week</button>
+        <button type="button" class="admin-range-tab" data-range="month">Next 30 days</button>
+      </div>
+
+      <div class="admin-filter-wrap">
+        <button type="button" class="admin-scroll-btn" id="adminScrollLeft" aria-label="Scroll dates left">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.4 7.4L14 6l-6 6 6 6 1.4-1.4-4.6-4.6z"/></svg>
+        </button>
+        <div class="admin-filter" id="adminFilter">
+          <!-- filter buttons injected -->
+        </div>
+        <button type="button" class="admin-scroll-btn" id="adminScrollRight" aria-label="Scroll dates right">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.6 7.4L10 6l6 6-6 6-1.4-1.4 4.6-4.6z"/></svg>
+        </button>
       </div>
 
       <div class="admin-list" id="adminList">
         <!-- day sections injected -->
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADMIN: ADD BOOKING / BLOCK SLOT FORM ============ -->
+<div class="modal adm-form-modal" id="admFormModal" role="dialog" aria-labelledby="admFormTitle">
+  <div class="modal-box">
+    <button class="modal-close" type="button" aria-label="Close" id="admFormClose">×</button>
+    <div class="adm-form-head">
+      <h3 id="admFormTitle">Add a booking</h3>
+      <p id="admFormDate">—</p>
+    </div>
+    <div class="adm-form-body">
+      <form id="admForm" novalidate>
+        <!-- Shown for both modes -->
+        <div class="adm-field">
+          <label for="admTime">Time slot</label>
+          <select id="admTime"></select>
+        </div>
+
+        <!-- Booking-only fields -->
+        <div id="admBookingFields">
+          <div class="adm-field">
+            <label for="admName">Guest name</label>
+            <input type="text" id="admName" placeholder="e.g. Puan Aminah" autocomplete="off">
+          </div>
+          <div class="adm-field-row">
+            <div class="adm-field">
+              <label for="admPhone">Phone</label>
+              <input type="tel" id="admPhone" placeholder="012-345 6789" autocomplete="off">
+            </div>
+            <div class="adm-field">
+              <label for="admParty">Guests</label>
+              <select id="admParty">
+                <option value="1">1 person</option>
+                <option value="2" selected>2 people</option>
+                <option value="3">3 people</option>
+                <option value="4">4 people</option>
+              </select>
+            </div>
+          </div>
+          <p class="adm-form-hint" style="margin:-6px 0 14px;">One booking = one table (up to 4 pax). For a bigger group, add a booking per table &mdash; e.g. two bookings for a party of 8.</p>
+          <div class="adm-field">
+            <label for="admEmail">Email <span class="opt">— optional, for walk-ins you can leave this blank</span></label>
+            <input type="email" id="admEmail" placeholder="guest@email.com" autocomplete="off">
+          </div>
+          <div class="adm-field">
+            <label for="admNotes">Note <span class="opt">— optional</span></label>
+            <input type="text" id="admNotes" placeholder="e.g. booked by phone, birthday" autocomplete="off">
+          </div>
+          <label class="adm-check">
+            <input type="checkbox" id="admSendEmail" checked>
+            <span>Send the guest a confirmation email with a cancel link. Only works if you filled in their email above.</span>
+          </label>
+        </div>
+
+        <!-- Block-only fields -->
+        <div id="admBlockFields" hidden>
+          <div class="adm-field">
+            <label for="admReason">Reason</label>
+            <input type="text" id="admReason" placeholder="e.g. Private event, family matters" autocomplete="off">
+          </div>
+          <p class="adm-form-hint">This slot will stop showing on the website straight away.</p>
+        </div>
+
+        <p class="adm-form-error" id="admFormError"></p>
+        <div class="adm-form-actions">
+          <button type="button" class="adm-btn-cancel" id="admFormCancel">Cancel</button>
+          <button type="submit" class="adm-btn-save" id="admFormSave">Save booking</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -2997,9 +3304,12 @@ footer {
   const ADMIN_KEY = 'KinuxDapoDough2026SecretKey';
   const DASHBOARD_PASSWORD = 'Kicapsoya@26';
   const AUTH_STORAGE_KEY = 'dd_admin_auth_v1';
-  const SLOT_CAPACITY = 4;
-  const WEEKDAY_SLOTS = ['7:30 AM','8:00 AM','8:30 AM','9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM'];
-  const SATURDAY_SLOTS = WEEKDAY_SLOTS.concat(['11:30 AM','12:00 PM']);
+  // 7 tables per seating, each table fits up to 4 pax.
+  // Party size is capped at 4 in the form, so one booking always = one table.
+  const SLOT_CAPACITY = 7;
+  const MAX_PARTY = 4;
+  const WEEKDAY_SLOTS = ['7:30 AM','8:30 AM','10:00 AM','11:00 AM'];
+  const SATURDAY_SLOTS = WEEKDAY_SLOTS.concat(['12:00 PM']);
   const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -3007,17 +3317,33 @@ footer {
   const TODAY = new Date();
   TODAY.setHours(0, 0, 0, 0);
 
-  const EMAILJS_SERVICE = 'service_h1f4ewe';
-  const EMAILJS_TEMPLATE_CUSTOMER = 'template_appolxo';
-  const EMAILJS_TEMPLATE_FUZZIHA = 'template_fs73c5k';
+  // EmailJS — Dapo & Dough's own account (dapondough@gmail.com), Personal plan
+  const EMAILJS_SERVICE = 'service_0ceup3b';
+  const EMAILJS_TEMPLATE_CUSTOMER = 'template_uwa2vve';
+  const EMAILJS_TEMPLATE_FUZZIHA = 'template_37w0jul';
 
   let state = {
     availability: {},
     adminBookings: [],
     viewMonth: new Date(TODAY.getFullYear(), TODAY.getMonth(), 1),
     calSelected: null,
-    slotSelected: null
+    slotSelected: null,
+    loadingAvailability: false,
+    availabilityLoadedOnce: false
   };
+
+  // ---------- Busy cursor ----------
+  // Shows a "progress" cursor site-wide while any network call is in flight,
+  // so customers on slow connections know the page is working, not frozen.
+  let busyCount = 0;
+  function busyStart() {
+    busyCount++;
+    document.body.classList.add('dd-busy');
+  }
+  function busyEnd() {
+    busyCount = Math.max(0, busyCount - 1);
+    if (busyCount === 0) document.body.classList.remove('dd-busy');
+  }
 
   // ---------- helpers ----------
   const pad = n => String(n).padStart(2, '0');
@@ -3026,6 +3352,34 @@ footer {
   const humanDate = d => `${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
   const humanDateLong = d => `${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
   function slotsForDate(dateObj) { return dateObj.getDay() === 6 ? SATURDAY_SLOTS : WEEKDAY_SLOTS; }
+
+  // ---------- Same-day cut-off ----------
+  // Customers must not be able to book a time that has already passed today.
+  // LEAD_TIME_MINUTES also stops a booking for a slot starting in a few minutes,
+  // which the kitchen has no chance to prepare for.
+  const LEAD_TIME_MINUTES = 30;
+  function slotToMinutes(timeStr) {
+    const m = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(String(timeStr).trim());
+    if (!m) return null;
+    let h = parseInt(m[1], 10);
+    const mins = parseInt(m[2], 10);
+    const mer = m[3].toUpperCase();
+    if (mer === 'PM' && h !== 12) h += 12;
+    if (mer === 'AM' && h === 12) h = 0;
+    return h * 60 + mins;
+  }
+  function isSlotPast(dateStr, timeStr) {
+    if (dateStr !== iso(new Date())) return false;   // only today is affected
+    const slotMin = slotToMinutes(timeStr);
+    if (slotMin === null) return false;
+    const now = new Date();
+    return slotMin < (now.getHours() * 60 + now.getMinutes() + LEAD_TIME_MINUTES);
+  }
+  // True when every slot on this date has already passed
+  function allSlotsPast(dateStr) {
+    const d = parseIso(dateStr);
+    return slotsForDate(d).every(t => isSlotPast(dateStr, t));
+  }
   function isPast(dateObj) { return dateObj < TODAY; }
   function isoFromMixed(v) {
     if (!v) return '';
@@ -3047,6 +3401,7 @@ footer {
     const url = BACKEND_URL + '?' + new URLSearchParams(params).toString();
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+    busyStart();
     try {
       const res = await fetch(url, { redirect: 'follow', signal: controller.signal });
       clearTimeout(timeoutId);
@@ -3055,29 +3410,44 @@ footer {
     } catch (e) {
       clearTimeout(timeoutId);
       throw e;
+    } finally {
+      busyEnd();
     }
   }
   async function apiPost(body) {
-    const res = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body),
-      redirect: 'follow'
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    return await res.json();
+    busyStart();
+    try {
+      const res = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(body),
+        redirect: 'follow'
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } finally {
+      busyEnd();
+    }
   }
 
   async function loadAvailability() {
+    state.loadingAvailability = true;
+    renderCalendar();
+    renderSlots();
     try {
       const data = await apiGet({ action: 'availability', from: iso(TODAY), days: '35' });
       if (data && data.ok) {
         state.availability = data.availability || {};
-        renderCalendar();
-        if (state.slotSelected || state.calSelected) renderSlots();
+        state.availabilityLoadedOnce = true;
         return true;
       }
-    } catch (e) { console.warn('Availability load failed:', e); }
+    } catch (e) {
+      console.warn('Availability load failed:', e);
+    } finally {
+      state.loadingAvailability = false;
+      renderCalendar();
+      renderSlots();
+    }
     return false;
   }
 
@@ -3118,6 +3488,7 @@ footer {
       btn.className = 'cal-day'; btn.type = 'button'; btn.textContent = d;
       if (dow === 0 || dow === 1) { btn.classList.add('closed'); btn.disabled = true; }
       else if (isPast(dateObj)) { btn.classList.add('disabled'); btn.disabled = true; }
+      else if (allSlotsPast(dateStr)) { btn.classList.add('disabled'); btn.disabled = true; btn.title = 'No seatings left today'; }
       else if (isDateFull(dateStr)) { btn.classList.add('closed'); btn.disabled = true; btn.title = 'Fully booked'; }
       if (dateStr === iso(TODAY)) btn.classList.add('today');
       if (state.calSelected === dateStr) btn.classList.add('selected');
@@ -3130,6 +3501,18 @@ footer {
       });
       cal.appendChild(btn);
     }
+
+    // Loading veil over the calendar on first load (and on month changes),
+    // so a slow connection reads as "loading", not "broken".
+    const existingVeil = cal.parentNode && cal.parentNode.querySelector('.cal-loading-veil');
+    if (existingVeil) existingVeil.remove();
+    if (state.loadingAvailability && cal.parentNode) {
+      if (!cal.parentNode.classList.contains('cal-wrap')) cal.parentNode.classList.add('cal-wrap');
+      const veil = document.createElement('div');
+      veil.className = 'cal-loading-veil';
+      veil.innerHTML = '<span class="spinner-ring"></span><span>Loading availability…</span>';
+      cal.parentNode.appendChild(veil);
+    }
   }
 
   // ---------- Slots ----------
@@ -3137,18 +3520,41 @@ footer {
   function renderSlots() {
     if (!slotsEl) return;
     slotsEl.innerHTML = '';
+    const noteEl = document.getElementById('slotsLoadNote');
+    if (noteEl) noteEl.remove();
     if (!state.calSelected) return;
     const dateObj = parseIso(state.calSelected);
+
+    // While availability is still loading, show shimmer placeholders in the
+    // same grid shape so the layout doesn't jump and the customer can see
+    // that something is happening.
+    if (state.loadingAvailability) {
+      slotsForDate(dateObj).forEach(() => {
+        const sk = document.createElement('div');
+        sk.className = 'slot skeleton';
+        sk.innerHTML = '0:00 AM<small>Loading</small>';
+        slotsEl.appendChild(sk);
+      });
+      const note = document.createElement('div');
+      note.className = 'load-note';
+      note.id = 'slotsLoadNote';
+      note.innerHTML = '<span class="spinner-ring"></span><span>Checking which times are still open…</span>';
+      if (slotsEl.parentNode) slotsEl.parentNode.insertBefore(note, slotsEl.nextSibling);
+      return;
+    }
+
     slotsForDate(dateObj).forEach(time => {
       const btn = document.createElement('button');
       btn.type = 'button';
       const s = slotState(state.calSelected, time);
-      const full = !s.available;
+      const past = isSlotPast(state.calSelected, time);
+      const full = !s.available || past;
       btn.className = 'slot' + (full ? ' full' : '') + (state.slotSelected === time ? ' selected' : '');
       btn.disabled = full;
       let label = 'Available';
-      if (s.blocked) label = 'Blocked';
-      else if (full) label = 'Full';
+      if (past) label = 'Passed';
+      else if (s.blocked) label = 'Blocked';
+      else if (!s.available) label = 'Full';
       else if (s.remaining < SLOT_CAPACITY) label = `${s.remaining} left`;
       btn.innerHTML = `${time}<small>${label}</small>`;
       btn.addEventListener('click', () => {
@@ -3199,8 +3605,8 @@ footer {
       if (!phone || !email) { alert('Please fill in your phone number and email so we can send your confirmation.'); return; }
       if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) { alert('That email address doesn\'t look right. Please check and try again.'); return; }
       btn.disabled = true;
-      const origText = btn.textContent;
-      btn.textContent = 'Submitting...';
+      const origHtml = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner-ring" style="display:inline-block;vertical-align:-3px;margin-right:8px;border-color:rgba(247,247,243,0.35);border-top-color:var(--broken);"></span>Reserving your table…';
       try {
         const result = await apiPost({
           action: 'book',
@@ -3218,7 +3624,7 @@ footer {
         console.error('Booking failed:', err);
         alert('Sorry, the booking service is unreachable right now. Please WhatsApp us at 014-830 3880 to book directly.');
       } finally {
-        btn.disabled = false; btn.textContent = origText;
+        btn.disabled = false; btn.innerHTML = origHtml;
       }
     });
   });
@@ -3298,7 +3704,7 @@ footer {
     document.getElementById('cd-name').textContent = b.name;
     document.getElementById('cd-email').textContent = b.email;
     document.getElementById('ep-date').textContent = `· ${humanDate(d)}`;
-    document.getElementById('ep-name').textContent = b.name.split(' ')[0];
+    document.getElementById('ep-name').textContent = String(b.name || 'friend').split(' ')[0];
     document.getElementById('ep-datetime').textContent = `${humanDateLong(d)} at ${b.time}`;
     document.getElementById('ep-party').textContent = b.party;
     document.getElementById('confirmModal').classList.add('open');
@@ -3331,8 +3737,32 @@ footer {
   if (cancelLink) cancelLink.addEventListener('click', cancelCurrentBookingViaLink);
 
   // ---------- Admin dashboard ----------
-  let adminFilter = 'week';
+  // adminRange: 'week' (7 days) or 'month' (rolling 30 days from today)
+  // adminFilter: 'all' (every day in range) or a specific ISO date
+  let adminRange = 'week';
+  let adminFilter = 'all';
   let adminFetchInFlight = false;
+
+  // How many days each range spans, counting from today
+  function rangeDayCount() { return adminRange === 'month' ? 30 : 7; }
+
+  // The days shown inside the active range.
+  // Normally Sun & Mon are closed and hidden — but if a booking somehow exists
+  // on one (legacy data, a special event, a schedule change), still show that
+  // day so it can never go unnoticed.
+  function rangeOpenDates() {
+    const out = [];
+    for (let i = 0; i < rangeDayCount(); i++) {
+      const d = new Date(TODAY); d.setDate(TODAY.getDate() + i);
+      const ds = iso(d);
+      const closedDay = (d.getDay() === 0 || d.getDay() === 1);
+      if (!closedDay || hasAnyBooking(ds)) out.push(ds);
+    }
+    return out;
+  }
+  function hasAnyBooking(dateStr) {
+    return state.adminBookings.some(b => isoFromMixed(b.date) === dateStr && b.status !== 'cancelled');
+  }
   async function fetchAdminBookings() {
     if (adminFetchInFlight) return true; // prevent concurrent fetches
     adminFetchInFlight = true;
@@ -3346,14 +3776,31 @@ footer {
     return false;
   }
   function computeStats() {
-    const week = [];
-    for (let i = 0; i < 7; i++) { const d = new Date(TODAY); d.setDate(TODAY.getDate() + i); week.push(iso(d)); }
-    const inWeek = state.adminBookings.filter(b => week.includes(isoFromMixed(b.date)));
-    const confirmedInWeek = inWeek.filter(b => b.status === 'confirmed');
+    // Stats follow the active range so the numbers always match what's on screen
+    const span = [];
+    for (let i = 0; i < rangeDayCount(); i++) { const d = new Date(TODAY); d.setDate(TODAY.getDate() + i); span.push(iso(d)); }
+    const inSpan = state.adminBookings.filter(b => span.includes(isoFromMixed(b.date)));
+    const confirmedInSpan = inSpan.filter(b => b.status === 'confirmed');
     const todayBookings = state.adminBookings.filter(b => isoFromMixed(b.date) === iso(TODAY) && b.status === 'confirmed');
-    const guests = confirmedInWeek.reduce((sum, b) => sum + (parseInt(b.party, 10) || 0), 0);
-    const blocked = inWeek.filter(b => b.status === 'blocked').length;
-    return { week: confirmedInWeek.length, today: todayBookings.length, guests, blocked };
+    const guests = confirmedInSpan.reduce((sum, b) => sum + (parseInt(b.party, 10) || 0), 0);
+    const blocked = inSpan.filter(b => b.status === 'blocked').length;
+    return { span: confirmedInSpan.length, today: todayBookings.length, guests, blocked };
+  }
+
+  // Count of non-cancelled bookings on a given date (used for the chip dots)
+  function bookingsOnDate(dateStr) {
+    return state.adminBookings.filter(b => isoFromMixed(b.date) === dateStr && b.status !== 'cancelled').length;
+  }
+
+  // Enable/disable the scroll arrows based on scroll position
+  function updateAdminScrollButtons() {
+    const row = document.getElementById('adminFilter');
+    const left = document.getElementById('adminScrollLeft');
+    const right = document.getElementById('adminScrollRight');
+    if (!row || !left || !right) return;
+    const maxScroll = row.scrollWidth - row.clientWidth;
+    left.disabled = row.scrollLeft <= 2;
+    right.disabled = row.scrollLeft >= maxScroll - 2;
   }
 
   async function renderAdmin(skipFetch = false) {
@@ -3371,40 +3818,51 @@ footer {
     }
     try {
       const stats = computeStats();
-      document.getElementById('stat-week').textContent = stats.week;
+      document.getElementById('stat-week').textContent = stats.span;
+      document.getElementById('stat-week-label').textContent = adminRange === 'month' ? 'Next 30 days' : 'This week';
       document.getElementById('stat-today').textContent = stats.today;
       document.getElementById('stat-guests').textContent = stats.guests;
       document.getElementById('stat-blocked').textContent = stats.blocked;
+      document.getElementById('stat-guests-sub').textContent = adminRange === 'month' ? 'across 30 days' : 'across the week';
 
-      // Render filter buttons
+      // Keep the range tabs in sync
+      document.querySelectorAll('.admin-range-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.range === adminRange);
+      });
+
+      // Render the date chip row: "All ..." first, then every open day in range
       const filterEl = document.getElementById('adminFilter');
       filterEl.innerHTML = '';
-      const filters = [
-        { key: 'week', label: 'This week' },
-        { key: iso(TODAY), label: 'Today' },
-      ];
-      for (let i = 1; i <= 7; i++) {
-        const d = new Date(TODAY); d.setDate(TODAY.getDate() + i);
-        filters.push({ key: iso(d), label: humanDate(d) });
-      }
+      const todayIso = iso(TODAY);
+      const openDates = rangeOpenDates();
+
+      const filters = [{ key: 'all', label: adminRange === 'month' ? 'All 30 days' : 'All week' }];
+      openDates.forEach(ds => {
+        filters.push({ key: ds, label: ds === todayIso ? 'Today' : humanDate(parseIso(ds)) });
+      });
+
+      let activeChip = null;
       filters.forEach(f => {
         const b = document.createElement('button');
-        b.textContent = f.label; b.type = 'button';
-        if (f.key === adminFilter) b.classList.add('active');
+        b.textContent = f.label;
+        b.type = 'button';
+        if (f.key === adminFilter) { b.classList.add('active'); activeChip = b; }
+        if (f.key === todayIso) b.classList.add('is-today');
+        if (f.key !== 'all' && bookingsOnDate(f.key) > 0) b.classList.add('has-bookings');
         b.addEventListener('click', () => { adminFilter = f.key; renderAdmin(true); });
         filterEl.appendChild(b);
       });
 
-      // Determine which dates to display
-      let dates = [];
-      if (adminFilter === 'week') {
-        for (let i = 0; i < 8; i++) {
-          const d = new Date(TODAY); d.setDate(TODAY.getDate() + i);
-          if (d.getDay() !== 0 && d.getDay() !== 1) dates.push(iso(d));
+      // Bring the selected chip into view and refresh the arrow states
+      requestAnimationFrame(() => {
+        if (activeChip && activeChip.scrollIntoView) {
+          activeChip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
-      } else {
-        dates = [adminFilter];
-      }
+        updateAdminScrollButtons();
+      });
+
+      // Determine which dates to display in the list below
+      const dates = (adminFilter === 'all') ? openDates : [adminFilter];
 
       // Render bookings
       listEl.innerHTML = '';
@@ -3418,14 +3876,14 @@ footer {
         const activeCount = dayBookings.filter(b => b.status !== 'cancelled').length;
 
         // Skip empty days ONLY in week view; specific-day view always shows the header
-        if (dayBookings.length === 0 && adminFilter === 'week') return;
+        if (dayBookings.length === 0 && adminFilter === 'all') return;
 
         const daySection = document.createElement('div');
         daySection.className = 'admin-day';
         daySection.innerHTML = `<div class="admin-day-head"><h4 class="admin-day-title">${humanDate(dateObj)}</h4><span class="admin-day-count">${activeCount} ${activeCount === 1 ? 'booking' : 'bookings'}</span></div>`;
         const listWrap = document.createElement('div');
 
-        if (activeCount === 0 && adminFilter !== 'week') {
+        if (activeCount === 0 && adminFilter !== 'all') {
           const empty = document.createElement('div');
           empty.className = 'admin-empty';
           empty.style.padding = '20px';
@@ -3441,18 +3899,29 @@ footer {
           if (b.status === 'blocked') {
             row.innerHTML = `<span class="admin-time">${escapeHtml(b.time)}</span><div><p class="admin-name">${escapeHtml(b.name)}</p><p class="admin-meta">Slot manually blocked</p></div><span class="admin-party">—</span><div class="admin-actions"><button class="admin-btn danger" title="Remove block" data-unblock="${escapeHtml(b.id)}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg></button></div>`;
           } else {
-            const phoneDigits = (b.phone||'').replace(/\D/g,'');
+            const phoneDigits = String(b.phone == null ? '' : b.phone).replace(/\D/g,'');
             row.innerHTML = `<span class="admin-time">${escapeHtml(b.time)}</span><div><p class="admin-name">${escapeHtml(b.name)}</p><p class="admin-meta">${escapeHtml(b.phone||'')} · ${escapeHtml(b.email||'')}${b.ref ? ' · ' + escapeHtml(b.ref) : ''}</p></div><span class="admin-party">${escapeHtml(String(b.party||''))} pax</span><div class="admin-actions"><a class="admin-btn" href="https://wa.me/6${encodeURIComponent(phoneDigits)}" target="_blank" title="WhatsApp guest"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2zm5 14c-.3.7-1.5 1.4-2 1.4-.6.1-1.3.1-4.2-1-3.6-1.5-5.9-5.3-6-5.5-.2-.3-1.4-2-1.4-3.7 0-1.7.9-2.6 1.2-3 .3-.3.7-.4 1-.4h.7c.2 0 .5 0 .8.6.3.7 1 2.4 1.1 2.6.1.2.1.4 0 .6-.1.2-.2.4-.4.6l-.4.5c-.2.2-.3.4-.2.7.2.3.9 1.5 2 2.4 1.4 1.2 2.5 1.6 2.9 1.7.3.2.6.1.7-.1l1-1.1c.3-.3.5-.3.8-.2.3.1 2 1 2.4 1.2.4.2.6.3.7.4.1.3.1.9-.2 1.6z"/></svg></a><button class="admin-btn" title="Mark no-show" data-noshow="${escapeHtml(b.id)}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm5 11H7v-2h10v2z"/></svg></button><button class="admin-btn danger" title="Cancel booking" data-cancel="${escapeHtml(b.id)}"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.4L17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/></svg></button></div>`;
           }
           listWrap.appendChild(row);
         });
 
-        if (adminFilter !== 'week' && !isPast(dateObj) && dateObj.getDay() !== 0 && dateObj.getDay() !== 1) {
+        if (adminFilter !== 'all' && !isPast(dateObj) && dateObj.getDay() !== 0 && dateObj.getDay() !== 1) {
+          const actions = document.createElement('div');
+          actions.className = 'admin-day-actions';
+
+          const addBtn = document.createElement('button');
+          addBtn.className = 'admin-add-walkin'; addBtn.type = 'button';
+          addBtn.textContent = '+ Add booking';
+          addBtn.dataset.addDate = dateStr;
+          actions.appendChild(addBtn);
+
           const blockBtn = document.createElement('button');
           blockBtn.className = 'admin-block-slot'; blockBtn.type = 'button';
-          blockBtn.textContent = '+ Block a slot on this day';
+          blockBtn.textContent = '+ Block a slot';
           blockBtn.dataset.blockDate = dateStr;
-          listWrap.appendChild(blockBtn);
+          actions.appendChild(blockBtn);
+
+          listWrap.appendChild(actions);
         }
         daySection.appendChild(listWrap);
         listEl.appendChild(daySection);
@@ -3481,22 +3950,183 @@ footer {
       if (r.ok) { await loadAvailability(); renderAdmin(); }
       else alert('Unblock failed: ' + (r.error || 'unknown error'));
     }));
-    list.querySelectorAll('[data-block-date]').forEach(btn => btn.addEventListener('click', async () => {
-      const dateStr = btn.dataset.blockDate;
-      const dateObj = parseIso(dateStr);
-      const slots = slotsForDate(dateObj);
-      const chosen = prompt(`Block which slot?\nAvailable: ${slots.join(', ')}\n\nType exact time (e.g. 7:30 AM):`);
-      if (!chosen || !slots.includes(chosen)) return;
-      const reason = prompt('Reason? (e.g. Private event, Fadhli dentist)') || 'Manual block';
-      const r = await apiPost({ action: 'admin_block', admin_key: ADMIN_KEY, date: dateStr, time: chosen, reason });
-      if (r.ok) { await loadAvailability(); renderAdmin(); }
-      else alert('Block failed: ' + (r.error || 'unknown error'));
+    list.querySelectorAll('[data-block-date]').forEach(btn => btn.addEventListener('click', () => {
+      openAdmForm('block', btn.dataset.blockDate);
+    }));
+    list.querySelectorAll('[data-add-date]').forEach(btn => btn.addEventListener('click', () => {
+      openAdmForm('book', btn.dataset.addDate);
     }));
     } catch (err) {
       console.error('[admin] render error:', err);
       listEl.innerHTML = '<div class="admin-empty">Something went wrong rendering the dashboard. Please refresh the page.<br><small style="opacity:0.6;">' + escapeHtml(String(err && err.message || err)) + '</small></div>';
     }
   }
+
+  // ---------- Admin: Add booking / Block slot form ----------
+  // Replaces the old browser prompt() flow. Lets Fuzziha take a phone booking
+  // or a walk-in straight into the system instead of hand-editing the Sheet.
+  let admFormMode = 'book';   // 'book' | 'block'
+  let admFormDate = null;
+
+  function openAdmForm(mode, dateStr) {
+    admFormMode = mode;
+    admFormDate = dateStr;
+    const dateObj = parseIso(dateStr);
+
+    document.getElementById('admFormTitle').textContent =
+      mode === 'book' ? 'Add a booking' : 'Block a slot';
+    document.getElementById('admFormDate').textContent = humanDateLong(dateObj);
+    document.getElementById('admFormSave').textContent =
+      mode === 'book' ? 'Save booking' : 'Block this slot';
+    document.getElementById('admBookingFields').hidden = (mode !== 'book');
+    document.getElementById('admBlockFields').hidden = (mode !== 'block');
+    document.getElementById('admFormError').textContent = '';
+
+    // Reset the inputs
+    ['admName','admPhone','admEmail','admNotes','admReason'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('admParty').value = '2';
+    document.getElementById('admSendEmail').checked = true;
+
+    // Build the time dropdown. For a booking, only offer slots that are actually
+    // open — so Fuzziha can't accidentally overbook a full or blocked slot.
+    const sel = document.getElementById('admTime');
+    sel.innerHTML = '';
+    let offered = 0;
+    slotsForDate(dateObj).forEach(t => {
+      const s = slotState(dateStr, t);
+      const past = isSlotPast(dateStr, t);
+      if (mode === 'book' && (!s.available || past)) return;  // skip full/blocked/past
+      if (mode === 'block' && (s.blocked || past)) return;    // already blocked or gone
+      const o = document.createElement('option');
+      o.value = t;
+      o.textContent = (mode === 'book' && s.remaining < SLOT_CAPACITY)
+        ? `${t} — ${s.remaining} left` : t;
+      sel.appendChild(o);
+      offered++;
+    });
+
+    const saveBtn = document.getElementById('admFormSave');
+    if (offered === 0) {
+      const o = document.createElement('option');
+      o.textContent = mode === 'book' ? 'No open slots on this day' : 'Nothing left to block';
+      sel.appendChild(o);
+      sel.disabled = true; saveBtn.disabled = true;
+    } else {
+      sel.disabled = false; saveBtn.disabled = false;
+    }
+
+    document.getElementById('admFormModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+      const first = document.getElementById(mode === 'book' ? 'admName' : 'admReason');
+      if (first && offered > 0) first.focus();
+    }, 80);
+  }
+
+  function closeAdmForm() {
+    document.getElementById('admFormModal').classList.remove('open');
+    // The admin dashboard is still open behind this, so keep the scroll lock
+    if (!document.querySelector('.admin-modal.open')) document.body.style.overflow = '';
+  }
+
+  // Send the guest their confirmation without touching the customer-facing
+  // modal's notification panel (which isn't on screen for an admin add).
+  function sendGuestEmailQuiet(b) {
+    if (typeof emailjs === 'undefined' || !b || !b.email) return;
+    const d = parseIso(b.date);
+    const cancelUrl = BACKEND_URL + '?action=cancel&token=' + encodeURIComponent(b.cancel_token || '');
+    const params = {
+      to_email: b.email, name: b.name, date: humanDate(d),
+      time: b.time, party: String(b.party), ref: b.ref,
+      phone: b.phone, cancel_url: cancelUrl, cancel_token: b.cancel_token || ''
+    };
+    emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE_CUSTOMER, params)
+      .catch(err => console.warn('Admin-added booking: guest email failed', err));
+  }
+
+  (function wireAdmForm() {
+    const form = document.getElementById('admForm');
+    if (!form) return;
+    const closeBtn = document.getElementById('admFormClose');
+    const cancelBtn = document.getElementById('admFormCancel');
+    const modal = document.getElementById('admFormModal');
+    if (closeBtn) closeBtn.addEventListener('click', closeAdmForm);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeAdmForm);
+    if (modal) modal.addEventListener('click', e => { if (e.target === modal) closeAdmForm(); });
+
+    // Clear the error as soon as they start correcting it
+    form.addEventListener('input', () => {
+      const errEl = document.getElementById('admFormError');
+      if (errEl && errEl.textContent) errEl.textContent = '';
+    });
+    // Esc closes the form
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById('admFormModal').classList.contains('open')) {
+        closeAdmForm();
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errEl = document.getElementById('admFormError');
+      const saveBtn = document.getElementById('admFormSave');
+      const time = document.getElementById('admTime').value;
+      errEl.textContent = '';
+      if (!time) { errEl.textContent = 'Please pick a time slot.'; return; }
+
+      let payload;
+      if (admFormMode === 'book') {
+        const name = document.getElementById('admName').value.trim();
+        const phone = document.getElementById('admPhone').value.trim();
+        const email = document.getElementById('admEmail').value.trim();
+        const party = parseInt(document.getElementById('admParty').value, 10) || 2;
+        const notes = document.getElementById('admNotes').value.trim();
+        if (!name) { errEl.textContent = 'Please enter the guest\'s name.'; return; }
+        if (!phone) { errEl.textContent = 'Please enter a phone number so you can reach them.'; return; }
+        if (email && !/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+          errEl.textContent = 'That email address doesn\'t look right.'; return;
+        }
+        payload = {
+          action: 'book', date: admFormDate, time, name, phone,
+          email: email, party,
+          notes: notes ? ('added by admin — ' + notes) : 'added by admin'
+        };
+      } else {
+        payload = {
+          action: 'admin_block', admin_key: ADMIN_KEY, date: admFormDate, time,
+          reason: document.getElementById('admReason').value.trim() || 'Manual block'
+        };
+      }
+
+      const origText = saveBtn.textContent;
+      saveBtn.disabled = true;
+      saveBtn.textContent = admFormMode === 'book' ? 'Saving…' : 'Blocking…';
+      try {
+        const r = await apiPost(payload);
+        if (!r || !r.ok) {
+          errEl.textContent = (r && r.error) || 'Something went wrong. Please try again.';
+          return;
+        }
+        // Optionally email the guest their confirmation + cancel link
+        if (admFormMode === 'book'
+            && document.getElementById('admSendEmail').checked
+            && payload.email && r.booking) {
+          sendGuestEmailQuiet(r.booking);
+        }
+        closeAdmForm();
+        await loadAvailability();
+        await renderAdmin();   // refetch so the new row appears
+      } catch (err) {
+        console.error('Admin form submit failed:', err);
+        errEl.textContent = 'Could not reach the server. Check your connection and try again.';
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = origText;
+      }
+    });
+  })();
 
   // Simple HTML escape helper for safe innerHTML
   function escapeHtml(str) {
@@ -3554,7 +4184,8 @@ footer {
     document.getElementById('viewBanner').classList.add('on');
     document.getElementById('adminModal').classList.add('open');
     document.body.style.overflow = 'hidden';
-    adminFilter = 'week';
+    adminRange = 'week';
+    adminFilter = 'all';
     showDashboardVsGate();
     if (isAuthenticated()) renderAdmin();
   }
@@ -3597,6 +4228,30 @@ footer {
     if (state.slotSelected) renderSlots();
   });
 
+  // ---------- Admin range tabs (This week / Next 30 days) ----------
+  document.querySelectorAll('.admin-range-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const next = tab.dataset.range;
+      if (next === adminRange) return;
+      adminRange = next;
+      adminFilter = 'all';   // reset to the overview whenever the range changes
+      renderAdmin(true);     // re-render from cached data, no refetch needed
+    });
+  });
+
+  // ---------- Admin date-row scroll arrows ----------
+  (function wireAdminScroll() {
+    const row = document.getElementById('adminFilter');
+    const left = document.getElementById('adminScrollLeft');
+    const right = document.getElementById('adminScrollRight');
+    if (!row || !left || !right) return;
+    const step = () => Math.max(160, Math.round(row.clientWidth * 0.7));
+    left.addEventListener('click', () => { row.scrollBy({ left: -step(), behavior: 'smooth' }); });
+    right.addEventListener('click', () => { row.scrollBy({ left: step(), behavior: 'smooth' }); });
+    row.addEventListener('scroll', updateAdminScrollButtons, { passive: true });
+    window.addEventListener('resize', updateAdminScrollButtons);
+  })();
+
   // Refresh button (was "Reset demo")
   const refreshBtn = document.getElementById('resetDemo');
   if (refreshBtn) {
@@ -3635,13 +4290,20 @@ footer {
     const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
     const diffDays = Math.ceil((monthEnd - TODAY) / (1000 * 60 * 60 * 24)) + 1;
     const days = Math.max(35, Math.min(diffDays + 7, 100));
+    state.loadingAvailability = true;
+    renderCalendar();
     try {
       const data = await apiGet({ action: 'availability', from: iso(TODAY), days: String(days) });
       if (data && data.ok) {
         state.availability = data.availability || {};
-        renderCalendar();
       }
-    } catch (e) { console.warn('Extended availability load failed:', e); }
+    } catch (e) {
+      console.warn('Extended availability load failed:', e);
+    } finally {
+      state.loadingAvailability = false;
+      renderCalendar();
+      renderSlots();
+    }
   }
 
   // ---------- Admin view guard ----------
