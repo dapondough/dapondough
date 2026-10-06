@@ -1813,7 +1813,10 @@ section { padding-block: 96px; }
 .cal-nav:hover { background: var(--broken-warm); }
 .calendar {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  /* minmax(0, 1fr) — plain 1fr floors each track at min-content, which with
+     .cal-day's aspect-ratio + min-height forced the grid to 318px and pushed
+     the Saturday column outside the card on any viewport under ~390px. */
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 4px;
 }
 .cal-dow {
@@ -1827,7 +1830,7 @@ section { padding-block: 96px; }
 }
 .cal-day {
   aspect-ratio: 1;
-  min-height: 42px;
+  min-height: 0;
   border: 0;
   background: transparent;
   border-radius: 6px;
@@ -2017,6 +2020,14 @@ body.dd-busy button, body.dd-busy .slot, body.dd-busy .cal-day { cursor: progres
   .booking-widget { padding: 28px 22px; margin-inline: 0; }
   .step-title { font-size: 22px; }
   .field-row { grid-template-columns: 1fr; }
+}
+
+/* Narrow Android phones (360px is the most common) and in-app browsers */
+@media (max-width: 430px) {
+  .booking-widget { padding: 24px 14px; }
+  .calendar { gap: 2px; }
+  .cal-day { font-size: 13px; }
+  .cal-dow { font-size: 9px; padding: 6px 0; }
 }
 
 /* ============ REVIEWS ============ */
@@ -3480,16 +3491,20 @@ footer {
   }
   async function apiPost(body) {
     busyStart();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
     try {
       const res = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(body),
-        redirect: 'follow'
+        redirect: 'follow',
+        signal: controller.signal
       });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       return await res.json();
     } finally {
+      clearTimeout(timeoutId);
       busyEnd();
     }
   }
@@ -3668,6 +3683,18 @@ footer {
       const party = parseInt(document.getElementById('fparty').value, 10) || 2;
       if (!phone || !email) { alert('Please fill in your phone number and email so we can send your confirmation.'); return; }
       if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) { alert('That email address doesn\'t look right. Please check and try again.'); return; }
+      // Guard against re-sending the same booking after an unclear failure.
+      // A dropped response still writes the row server-side, so a blind retry
+      // is what creates duplicate bookings.
+      const attemptKey = state.calSelected + '|' + state.slotSelected + '|' + email.toLowerCase();
+      if (window.__ddLastAttempt === attemptKey) {
+        const sendAgain = confirm(
+          'You already sent this booking a moment ago.\n\n' +
+          'It may have gone through even if you saw an error \u2014 please check your email inbox and spam folder first.\n\n' +
+          'Send it again anyway?');
+        if (!sendAgain) return;
+      }
+      window.__ddLastAttempt = attemptKey;
       btn.disabled = true;
       const origHtml = btn.innerHTML;
       btn.innerHTML = '<span class="spinner-ring" style="display:inline-block;vertical-align:-3px;margin-right:8px;border-color:rgba(247,247,243,0.35);border-top-color:var(--broken);"></span>Reserving your table…';
@@ -3686,7 +3713,9 @@ footer {
         openConfirmModal(result.booking);
       } catch (err) {
         console.error('Booking failed:', err);
-        alert('Sorry, the booking service is unreachable right now. Please WhatsApp us at 014-830 3880 to book directly.');
+        alert('We could not confirm your booking just now.\n\n' +
+              'It may still have gone through \u2014 please check your email (including your spam folder) before trying again.\n\n' +
+              'If nothing arrives in a few minutes, WhatsApp us at 014-830 3880 and we will book you in.');
       } finally {
         btn.disabled = false; btn.innerHTML = origHtml;
       }
