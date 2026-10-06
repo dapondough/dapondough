@@ -3489,7 +3489,7 @@ footer {
       busyEnd();
     }
   }
-  async function apiPost(body) {
+  async function apiPostOnce(body) {
     busyStart();
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout
@@ -3507,6 +3507,25 @@ footer {
       clearTimeout(timeoutId);
       busyEnd();
     }
+  }
+
+  // A booking POST can fail at the network layer while availability GETs keep
+  // working — a dropped response still leaves the row saved server-side.
+  // Retrying is only safe because the backend now returns the existing booking
+  // for a repeat of the same date/time/email instead of writing a second row.
+  async function apiPost(body, attempts) {
+    const tries = Math.max(1, attempts || 1);
+    let lastErr;
+    for (let i = 0; i < tries; i++) {
+      try {
+        return await apiPostOnce(body);
+      } catch (e) {
+        lastErr = e;
+        console.warn('apiPost attempt ' + (i + 1) + '/' + tries + ' failed:', e);
+      }
+      if (i < tries - 1) await new Promise(r => setTimeout(r, 600 * (i + 1)));
+    }
+    throw lastErr;
   }
 
   async function loadAvailability() {
@@ -3703,7 +3722,7 @@ footer {
           action: 'book',
           date: state.calSelected, time: state.slotSelected,
           name, phone, email, party
-        });
+        }, 3);
         if (!result.ok) {
           alert(result.error || 'Sorry, something went wrong. Please try again.');
           if (result.error && result.error.indexOf('fully booked') !== -1) { goToStep(2); loadAvailability(); }
@@ -3713,6 +3732,17 @@ footer {
         openConfirmModal(result.booking);
       } catch (err) {
         console.error('Booking failed:', err);
+        // A dropped response still saves the row. Ask the backend whether this
+        // booking actually landed before telling anyone it failed.
+        try {
+          const check = await apiGet({ action: 'lookup', date: state.calSelected,
+                                       time: state.slotSelected, email: email });
+          if (check && check.ok && check.found && check.booking) {
+            await loadAvailability();
+            openConfirmModal(check.booking);
+            return;
+          }
+        } catch (e2) { console.warn('Booking lookup failed:', e2); }
         alert('We could not confirm your booking just now.\n\n' +
               'It may still have gone through \u2014 please check your email (including your spam folder) before trying again.\n\n' +
               'If nothing arrives in a few minutes, WhatsApp us at 014-830 3880 and we will book you in.');
@@ -3753,13 +3783,13 @@ footer {
     if (typeof emailjs === 'undefined') {
       if (custItem) custItem.className = 'notif-item failed';
       if (fuzItem) fuzItem.className = 'notif-item failed';
-      if (custSub) custSub.innerHTML = 'Email service not reachable in this preview.';
+      if (custSub) custSub.innerHTML = 'Email service not reachable in this preview. <strong id="cd-email" hidden></strong>';
       if (fuzSub) fuzSub.innerHTML = 'Email service not reachable in this preview.';
       return;
     }
     if (custItem) custItem.className = 'notif-item sending';
     if (fuzItem) fuzItem.className = 'notif-item sending';
-    if (custSub) custSub.innerHTML = 'Sending to <strong>' + b.email + '</strong>…';
+    if (custSub) custSub.innerHTML = 'Sending to <strong id="cd-email">' + escapeHtml(b.email) + '</strong>…';
     if (fuzSub) fuzSub.innerHTML = 'Sending to the team…';
     const d = parseIso(b.date);
     const cancelUrl = BACKEND_URL + '?action=cancel&token=' + encodeURIComponent(b.cancel_token || '');
@@ -3770,10 +3800,10 @@ footer {
     };
     emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE_CUSTOMER, params).then(() => {
       if (custItem) custItem.className = 'notif-item sent';
-      if (custSub) custSub.innerHTML = 'Delivered to <strong>' + b.email + '</strong>';
+      if (custSub) custSub.innerHTML = 'Delivered to <strong id="cd-email">' + escapeHtml(b.email) + '</strong>';
     }).catch(err => {
       if (custItem) custItem.className = 'notif-item failed';
-      if (custSub) custSub.innerHTML = 'Failed to send: ' + (err && (err.text || err.message) || 'unknown error');
+      if (custSub) custSub.innerHTML = 'Failed to send: ' + escapeHtml(err && (err.text || err.message) || 'unknown error') + ' <strong id="cd-email" hidden></strong>';
       console.error('Customer email failed:', err);
     });
     emailjs.send(EMAILJS_SERVICE, EMAILJS_TEMPLATE_FUZZIHA, params).then(() => {
@@ -3781,7 +3811,7 @@ footer {
       if (fuzSub) fuzSub.innerHTML = 'Delivered — the team has been notified.';
     }).catch(err => {
       if (fuzItem) fuzItem.className = 'notif-item failed';
-      if (fuzSub) fuzSub.innerHTML = 'Failed to send: ' + (err && (err.text || err.message) || 'unknown error');
+      if (fuzSub) fuzSub.innerHTML = 'Failed to send: ' + escapeHtml(err && (err.text || err.message) || 'unknown error');
       console.error('Fuzziha email failed:', err);
     });
   }
@@ -3790,16 +3820,20 @@ footer {
     currentModalBooking = b;
     resetConfirmModalToConfirmed();
     const d = parseIso(b.date);
-    document.getElementById('confirmRef').textContent = `REF: ${b.ref}`;
-    document.getElementById('cd-date').textContent = humanDate(d);
-    document.getElementById('cd-time').textContent = b.time;
-    document.getElementById('cd-party').textContent = b.party + ' guest' + (b.party > 1 ? 's' : '');
-    document.getElementById('cd-name').textContent = b.name;
-    document.getElementById('cd-email').textContent = b.email;
-    document.getElementById('ep-date').textContent = `· ${humanDate(d)}`;
-    document.getElementById('ep-name').textContent = String(b.name || 'friend').split(' ')[0];
-    document.getElementById('ep-datetime').textContent = `${humanDateLong(d)} at ${b.time}`;
-    document.getElementById('ep-party').textContent = b.party;
+    // setText, not direct assignment: a single missing node used to throw here
+    // and take the whole confirmation down with it — no modal, no emails,
+    // while the booking sat saved in the sheet.
+    const setText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setText('confirmRef', `REF: ${b.ref}`);
+    setText('cd-date', humanDate(d));
+    setText('cd-time', b.time);
+    setText('cd-party', b.party + ' guest' + (b.party > 1 ? 's' : ''));
+    setText('cd-name', b.name);
+    setText('cd-email', b.email);
+    setText('ep-date', `· ${humanDate(d)}`);
+    setText('ep-name', String(b.name || 'friend').split(' ')[0]);
+    setText('ep-datetime', `${humanDateLong(d)} at ${b.time}`);
+    setText('ep-party', b.party);
     document.getElementById('confirmModal').classList.add('open');
     document.body.style.overflow = 'hidden';
     setTimeout(() => sendConfirmationEmails(b), 300);
