@@ -2824,8 +2824,10 @@ footer {
               <option value="2" selected>2 people</option>
               <option value="3">3 people</option>
               <option value="4">4 people</option>
+              <option value="5">5 people</option>
+              <option value="6">6 people</option>
             </select>
-            <p class="field-note">More than 4? <a href="https://wa.me/60148303880" target="_blank" rel="noopener">WhatsApp us</a> and we'll put tables together for you.</p>
+            <p class="field-note">More than 6? <a href="https://wa.me/60148303880" target="_blank" rel="noopener">WhatsApp us</a> and we'll put tables together for you.</p>
           </div>
           <div class="field">
             <label for="femail">Email (for confirmation)</label>
@@ -3277,10 +3279,12 @@ footer {
                 <option value="2" selected>2 people</option>
                 <option value="3">3 people</option>
                 <option value="4">4 people</option>
+                <option value="5">5 people</option>
+                <option value="6">6 people</option>
               </select>
             </div>
           </div>
-          <p class="adm-form-hint" style="margin:-6px 0 14px;">One booking = one table (up to 4 pax). For a bigger group, add a booking per table &mdash; e.g. two bookings for a party of 8.</p>
+          <p class="adm-form-hint" style="margin:-6px 0 14px;">A booking of 1&ndash;4 fits one table. <strong>5 or 6 pax needs two tables pushed together, but still counts as one booking</strong> &mdash; so on a seating with large groups, the tables used will be higher than the booking count. Check before a seating fills up. For more than 6, add one booking per table.</p>
           <div class="adm-field">
             <label for="admEmail">Email <span class="opt">— optional, for walk-ins you can leave this blank</span></label>
             <input type="email" id="admEmail" placeholder="guest@email.com" autocomplete="off">
@@ -3382,7 +3386,7 @@ footer {
   // 7 tables per seating, each table fits up to 4 pax.
   // Party size is capped at 4 in the form, so one booking always = one table.
   const SLOT_CAPACITY = 7;
-  const MAX_PARTY = 4;
+  const MAX_PARTY = 6;   // 5-6 pax need two tables pushed together
   const WEEKDAY_SLOTS = ['7:30 AM','8:30 AM','10:00 AM','11:00 AM'];
   const SATURDAY_SLOTS = WEEKDAY_SLOTS.concat(['12:00 PM']);
   const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
